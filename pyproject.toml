@@ -1,0 +1,12 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tensorSB"
+version = "0.1.0"
+description = "A powerful neural network toolkit with a focus on tensor operations."
+authors = [
+  { name="Subin Kim", email="subini0213@snu.ac.kr" },
+]
+requires-python = ">=3.10"
