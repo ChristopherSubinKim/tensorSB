@@ -1,1 +1,1 @@
-from .models import VariationalMPS
+from .models import VariationalMPS, MPOGenerator, MixedMPSGenerator

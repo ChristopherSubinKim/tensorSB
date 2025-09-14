@@ -5,7 +5,7 @@ from typing import Any
 
 def norm_MPS(M : list[Any]):
     """
-    <MPS|H|MPS> calculated
+    <MPS|MPS> calculated
 
     Parameters
     ----------

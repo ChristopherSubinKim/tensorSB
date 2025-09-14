@@ -15,7 +15,7 @@ def get_three_strings(n: int):
 
 def batched_ensemble_trace(ensemble: Sequence[list[torch.tensor]]):
     """
-    tr(rho)
+    tr(rho_1 rho_2 ... rho_n)
 
     Parameters
     ----------
