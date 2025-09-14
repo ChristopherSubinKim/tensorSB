@@ -56,6 +56,8 @@ class MPOGenerator(nn.Module):
         self.d = d
         self.n_site = n_site
         self.z_dim = z_dim
+        self.hidden_ch = hidden_ch
+        self.depth = depth
         self.out_ch = d * d * D * D  # output channels per site before boundary slicing
 
         # MLP to lift z to a site-wise feature sequence
@@ -208,6 +210,8 @@ class MixedMPSGenerator(nn.Module):
         self.d = d
         self.n_site = n_site
         self.z_dim = z_dim
+        self.hidden_ch=hidden_ch
+        self.depth = depth
         self.out_ch = d * D * D  # output channels per site before boundary slicing
 
         # MLP to lift z to a site-wise feature sequence
