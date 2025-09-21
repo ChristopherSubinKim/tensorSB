@@ -3,6 +3,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 from typing import List
 
+from .. import MPS
+from .. import MPO
 from .. import DensityMatrix
 from .. import MixedMPS
 
@@ -33,6 +35,18 @@ class VariationalMPS(nn.Module):
         loss   = torch.real(energy / (norm + eps))
         reg = nn.functional.relu(norm - norm_lim)
         return energy, norm, loss, reg
+    def forward_H_var(self, H, eps=0.0):
+        """
+        H: MPO (list[torch.Tensor], length = n_site)
+        eps: infinitesimal to avoid zero division
+        return: energy (scalar tensor), norm (scalar tensor), loss = Re(energy / (norm + eps))
+        """
+        M = self.current_M()
+        norm   = MPS.norm_MPS(M)              # <M|M>
+        H_val = MPS.H_val_MPS(M, H)/(norm+eps)          # <M|H|M>
+        H2 = MPO.squareMPO(H)
+        H2_val = MPS.H_val_MPS(M, H2)/(norm+eps)
+        return H_val**2-H2_val
 class MPOGenerator(nn.Module):
     """
     Args:
@@ -48,7 +62,7 @@ class MPOGenerator(nn.Module):
               [1:-1]-> (B, d, d, D, D)
               [-1]  -> (B, d, d, D, 1)
     """
-    def __init__(self, H : list[torch.Tensor], T: float ,D: int, d: int, n_site: int, z_dim: int, hidden_ch: int = 256, depth: int = 3):
+    def __init__(self, H : list[torch.Tensor], T: float ,D: int, d: int, n_site: int, z_dim: int, hidden_ch: int = 256, depth: int = 4):
         super().__init__()
         self.H = H
         self.T = T
@@ -145,7 +159,7 @@ class MPOGenerator(nn.Module):
                 mpo_list.append(core.contiguous())
         return mpo_list
 
-    def forward_H(self, z: torch.Tensor, eps : float =  0.0, trace_max = 10000, trace_min = 1e-2):
+    def forward_H(self, z: torch.Tensor, eps : float =  0.0, trace_max = 10, trace_min = 1e-1):
         """
         
         Args:
@@ -158,7 +172,7 @@ class MPOGenerator(nn.Module):
         E = DensityMatrix.batched_expected_value(mpo_list, self.H)
         trace = DensityMatrix.batched_trace(mpo_list)
         loss = E / (trace + eps) # (batch_size,)
-        reg = nn.functional.relu(trace - trace_max) + nn.functional.relu(trace_min - trace)
+        reg = 1e-2*(nn.functional.relu(trace - trace_max) + nn.functional.relu(trace_min - trace))
         
         return E, trace, loss, reg
     def forward_trace_power(self, z: torch.Tensor, power: int):
@@ -337,3 +351,10 @@ class MixedMPSGenerator(nn.Module):
         kb = 0.08617333 # meV/K
         S = kb*(133/60 -tr2*56/15 + tr3*91/60)
         return S
+    def fidelity(self, z1: torch.Tensor, z2: torch.Tensor):
+        M_list1 = self.gen_M(z1)
+        M_list2 = self.gen_M(z2)
+        fidelity = MixedMPS.batched_ensemble_trace([M_list1, M_list2])/torch.sqrt(MixedMPS.batched_ensemble_trace([M_list1,M_list1])*MixedMPS.batched_ensemble_trace([M_list2, M_list2]))
+        return fidelity
+    def latent_distance(self, z1: torch.Tensor, z2: torch.Tensor):
+        return torch.norm(z1-z2, dim=1)

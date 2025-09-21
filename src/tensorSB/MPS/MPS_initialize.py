@@ -38,7 +38,7 @@ def MPS_initialize(MPO: list[Any], n_keep: int|None = None, e_num: int = 1):
     H_list = [None]*n_site
 
     for it in range(n_site):
-        print(f"lattice site {it+1}/{n_site}")
+        # print(f"lattice site {it+1}/{n_site}")
         A_now = tensor.get_identity(A_prev,1,MPO[it],1,[0,2,1])
         H_now = tensor.update_left(H_prev,3,A_now,MPO[it],4,A_now) #rank-3
         H_list[it] = H_now

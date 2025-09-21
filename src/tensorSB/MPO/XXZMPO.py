@@ -4,7 +4,7 @@ from ..backend.backend import get_backend
 from .. import tensor
 from . import get_MPO
 
-def XXZMPO(Delta,n_site:int) -> list[Any]:
+def XXZMPO(Delta,h,n_site:int) -> list[Any]:
     """
     Build length n_site MPO of open boundary Heisenberg model Hamiltonian.
     H =  \Delta*Sz_i Sz_{i+1} +(Sx_i Sx_{i+1} + Sy_i Sy_{i+1})
@@ -13,6 +13,8 @@ def XXZMPO(Delta,n_site:int) -> list[Any]:
     ---------
     Delta : float
         The coupling constant for the XXZ model.
+    h : float
+        The external magnetic field strength.
     n_site : int
         The number of sites in the MPO.
         
@@ -48,4 +50,5 @@ def XXZMPO(Delta,n_site:int) -> list[Any]:
             MPO[i] = get_MPO(H, Ic, pos='end')
         else:
             MPO[i] = middle
+    H[0,4] = h*Sd[:,:,2]
     return MPO

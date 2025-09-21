@@ -34,6 +34,12 @@ def eig_1site_GS(H_left, H_cen, H_right, A_old, *,n_krylov, Lanczos_tol):
     A_s = [None]*n_krylov
     A_s[0] = A_old/backend.norm(A_old)
 
+    A_mul = tensor.contract('aij,inm->ajmn',H_left,A_s[0])
+    A_mul = tensor.contract('ajmn,lmjk->alkn',A_mul,H_cen)
+    A_mul = tensor.contract('alkn,bnk->abl',A_mul,H_right)
+    E_old = tensor.contract('abl,abl->',A_mul,backend.conj(A_s[0])).real
+    print(E_old)
+
     alphas = frame.zeros((n_krylov))
     betas = frame.zeros((n_krylov-1))
     cnt = 0
@@ -58,6 +64,7 @@ def eig_1site_GS(H_left, H_cen, H_right, A_old, *,n_krylov, Lanczos_tol):
     H_krylov = H_krylov + H_krylov.conj().T + frame.diag(alphas[:cnt])
     D, V = frame.linalg.eigh(H_krylov)
     min_idx = frame.argmin(D) # minimum idx
+    print(D)
     A_new = 0
     for it_k in range(cnt):
         A_new += V[it_k,min_idx]*A_s[it_k]
@@ -66,8 +73,5 @@ def eig_1site_GS(H_left, H_cen, H_right, A_old, *,n_krylov, Lanczos_tol):
     A_mul = tensor.contract('ajmn,lmjk->alkn',A_mul,H_cen)
     A_mul = tensor.contract('alkn,bnk->abl',A_mul,H_right)
     E_new = tensor.contract('abl,abl->',A_mul,backend.conj(A_new)).real
+    print(E_new)
     return A_new, E_new
-
-    
-
-

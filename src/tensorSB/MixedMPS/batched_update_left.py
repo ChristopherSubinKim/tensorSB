@@ -74,10 +74,12 @@ def batched_update_left(C_left, rank_C, B, X, rank_X, A, **kwargs):
             T = tensor.contract('...abi,...xi->...abx',T,X,**kwargs)
             C_left = tensor.contract('...iaj,...ixj->...xa',T,B,**kwargs)
         elif rank_X == 3:
-            T = tensor.contract('...iab,...xiy->...abxy',A,C_left,**kwargs)
+            T = tensor.contract('...iab,...xi->...xab',A,C_left,**kwargs)
+            T = tensor.contract('...abi,...xiy->...abxy',T,X,**kwargs)
             C_left = tensor.contract('...iajb,...ixj->...xab',T,B,**kwargs)
         elif rank_X == 4:
-            T = tensor.contract('...iab,...xiyz->...abxyz',A,C_left,**kwargs)
+            T = tensor.contract('...iab,...xi->...xab',A,C_left,**kwargs)
+            T = tensor.contract('...abi,...xiyz->...abxyz',T,X,**kwargs)
             C_left = tensor.contract('...iajbc,...ixj->...xabc',T,B,**kwargs)
     elif rank_C == 3:
         if X is None:
@@ -88,13 +90,13 @@ def batched_update_left(C_left, rank_C, B, X, rank_X, A, **kwargs):
             T = tensor.contract('...abic,...xi->...abxc',T,X,**kwargs)
             C_left = tensor.contract('...iajb,...ixj->...xab',T,B,**kwargs)
         elif rank_X == 3:
-            T = tensor.contract('...iab,...xiy->...abxy',A,C_left,**kwargs)
+            T = tensor.contract('...iab,...xiy->...xaby',A,C_left,**kwargs)
             T = tensor.contract('...abij,...xij->...abx',T,X,**kwargs)
             C_left = tensor.contract('...iaj,...ixj->...xa',T,B,**kwargs)
         elif rank_X == 4:
-            T = tensor.contract('...iab, ...xiyz->...abxyz',A,C_left,**kwargs)
-            T = tensor.contract('...abij, ...xijz->...abxz',T,X,**kwargs)
-            C_left = tensor.contract('...iajb, ...ixj->...xab',T,B,**kwargs)
+            T = tensor.contract('...iab,...xiy->...xaby',A,C_left,**kwargs)
+            T = tensor.contract('...abij,...xijz->...abxz',T,X,**kwargs)
+            C_left = tensor.contract('...iajb,...ixj->...xab',T,B,**kwargs)
     elif rank_C == 4:
         if X is None:
             T = tensor.contract('...iab, ...xiyz->...abxyz',A,C_left,**kwargs)
