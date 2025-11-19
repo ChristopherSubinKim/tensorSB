@@ -92,8 +92,11 @@ def get_local_space(kind, *args):
         I = backend.eye(4)
 
         # F (4x4x2): annihilation_up (..,0), annihilation_down (..,1)
-        F = backend.reshape(backend.eye(4) * 0, (4, 4, 2))
-        # up
+        # 먼저 (4,4) -> (4,4,1)로 만든 뒤, cat으로 마지막 축을 2로 늘림
+        F0 = backend.eye(4) * 0          # (4,4)
+        F0 = backend.reshape(F0, (4, 4, 1))  # (4,4,1)
+        F = backend.cat([F0, F0], k=2)       # (4,4,2)
+            # up
         F[0, 1, 0] = 1
         F[2, 3, 0] = -1   # minus for anticommutation
         # down

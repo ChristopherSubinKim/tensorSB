@@ -7,7 +7,7 @@ from . import get_MPO
 def XXZMPO(Delta,h,n_site:int) -> list[Any]:
     """
     Build length n_site MPO of open boundary Heisenberg model Hamiltonian.
-    H =  \Delta*Sz_i Sz_{i+1} +(Sx_i Sx_{i+1} + Sy_i Sy_{i+1})
+    H =  Delta*Sz_i Sz_{i+1} +(Sx_i Sx_{i+1} + Sy_i Sy_{i+1})
     
     Parameter
     ---------

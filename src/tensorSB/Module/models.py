@@ -5,8 +5,8 @@ from typing import List
 
 from .. import MPS
 from .. import MPO
-from .. import DensityMatrix
-from .. import MixedMPS
+from .. import batchedDensityMatrix
+from .. import batchedMPS
 
 class VariationalMPS(nn.Module):
     def __init__(self, M_init):
@@ -169,8 +169,8 @@ class MPOGenerator(nn.Module):
             trace_min (float, optional): Minimum trace for regularization.
         """
         mpo_list = self.gen_mpo(z[:,0,:]) 
-        E = DensityMatrix.batched_expected_value(mpo_list, self.H)
-        trace = DensityMatrix.batched_trace(mpo_list)
+        E = batchedDensityMatrix.batched_expected_value(mpo_list, self.H)
+        trace = batchedDensityMatrix.batched_trace(mpo_list)
         loss = E / (trace + eps) # (batch_size,)
         reg = 1e-2*(nn.functional.relu(trace - trace_max) + nn.functional.relu(trace_min - trace))
         
@@ -187,11 +187,11 @@ class MPOGenerator(nn.Module):
         ensemble = [None]*power
         for i in range(power):
             ensemble[i] = self.gen_mpo(z[:,i,:])
-        trace_power = DensityMatrix.batched_ensemble_trace(ensemble) # (batch_size,)
+        trace_power = batchedDensityMatrix.batched_ensemble_trace(ensemble) # (batch_size,)
         
         trace = [None]*power
         for i in range(power):
-            trace[i] = DensityMatrix.batched_trace(ensemble[i]) # (batch_size,)
+            trace[i] = batchedDensityMatrix.batched_trace(ensemble[i]) # (batch_size,)
         
         trace = torch.stack(trace, dim=1) # (batch_size, power)
         trace = torch.prod(trace, dim=1) # (batch_size,)
@@ -319,8 +319,8 @@ class MixedMPSGenerator(nn.Module):
             trace_min (float, optional): Minimum trace for regularization.
         """
         M = self.gen_M(z[:,0,:]) 
-        E = MixedMPS.batched_expected_value(M, self.H)
-        trace = MixedMPS.batched_trace(M)
+        E = batchedMPS.batched_expected_value(M, self.H)
+        trace = batchedMPS.batched_trace(M)
         loss = E / (trace + eps) # (batch_size,)
         reg = nn.functional.relu(trace - trace_max) + nn.functional.relu(trace_min - trace)
         
@@ -337,11 +337,11 @@ class MixedMPSGenerator(nn.Module):
         ensemble = [None]*power
         for i in range(power):
             ensemble[i] = self.gen_M(z[:,i,:])
-        trace_power = MixedMPS.batched_ensemble_trace(ensemble) # (batch_size,)
+        trace_power = batchedMPS.batched_ensemble_trace(ensemble) # (batch_size,)
         
         trace = [None]*power
         for i in range(power):
-            trace[i] = MixedMPS.batched_trace(ensemble[i]) # (batch_size,)
+            trace[i] = batchedMPS.batched_trace(ensemble[i]) # (batch_size,)
         
         trace = torch.stack(trace, dim=1) # (batch_size, power)
         trace = torch.prod(trace, dim=1) # (batch_size,)
@@ -354,7 +354,7 @@ class MixedMPSGenerator(nn.Module):
     def fidelity(self, z1: torch.Tensor, z2: torch.Tensor):
         M_list1 = self.gen_M(z1)
         M_list2 = self.gen_M(z2)
-        fidelity = MixedMPS.batched_ensemble_trace([M_list1, M_list2])/torch.sqrt(MixedMPS.batched_ensemble_trace([M_list1,M_list1])*MixedMPS.batched_ensemble_trace([M_list2, M_list2]))
+        fidelity = batchedMPS.batched_ensemble_trace([M_list1, M_list2])/torch.sqrt(batchedMPS.batched_ensemble_trace([M_list1,M_list1])*batchedMPS.batched_ensemble_trace([M_list2, M_list2]))
         return fidelity
     def latent_distance(self, z1: torch.Tensor, z2: torch.Tensor):
         return torch.norm(z1-z2, dim=1)
