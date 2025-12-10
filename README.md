@@ -14,12 +14,10 @@ conda env export > environment.yml
 Within your conda environment, run:
 ```
 cd tensorSB
-conda env update -f environment.yml # option 1
-conda install --file conda_requirements.txt # option 2
 pip install -e .
 
 ```
-
+Check installation.txt for required packages.
 ## Usage
 
 API examples can be found in the `examples/` directory.
