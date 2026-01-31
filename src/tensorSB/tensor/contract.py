@@ -26,6 +26,11 @@ def contract(expr,*operands, library: str = "einsum", **kwargs: Any) -> Any:
             r = cp.einsum(expr,*operands,**kwargs)
             return cp.asnumpy(r)
         else:
+            if frame_name == "torch":
+                # If any operand is complex, promote all to complex
+                if any(getattr(x, "is_complex", lambda: False)() for x in operands):
+                    target = frame.complex128  # or infer from the first complex operand
+                    operands = tuple(x.to(target) if not x.is_complex() else x for x in operands)
             return frame.einsum(expr,*operands,**kwargs)
 
     else:

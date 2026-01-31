@@ -23,6 +23,8 @@ import numpy as np
 try:
     import torch  # type: ignore
     torch.set_default_dtype(torch.float64)
+    # torch_dtype = torch.complex128
+    torch_dtype = torch.float64
 except Exception:  # pragma: no cover
     torch = None  # type: ignore
 
@@ -236,8 +238,11 @@ class TorchBackend:
     @staticmethod
     def eye(n: int):
         device = "cuda" if (torch.cuda.is_available()) else "cpu"  # type: ignore[attr-defined]
-        return torch.eye(n, device=device)  # type: ignore[name-defined]
-
+        return torch.eye(n, device=device,dtype=torch_dtype)  # type: ignore[name-defined]
+    @staticmethod
+    def eye_complex(n: int):
+        device = "cuda" if (torch.cuda.is_available()) else "cpu"  # type: ignore[attr-defined]
+        return torch.eye(n, device=device,dtype=torch.complex128)  # type: ignore[name-defined]
     @staticmethod
     def permute(A, order: Sequence[int]):
         axes = _normalize_perm(order, A.ndim)
@@ -260,10 +265,10 @@ class TorchBackend:
         device = "cuda" if (torch.cuda.is_available()) else "cpu"  # type: ignore[attr-defined]
         kind = _norm_kind(rand_type)
         if kind == "gaussian":
-            return torch.randn(*shape, device=device)  # type: ignore[name-defined]
+            return torch.randn(*shape, device=device,dtype=torch_dtype)  # type: ignore[name-defined]
         if kind == "uniform":
-            return torch.rand(*shape, device=device) * 2.0 - 1.0  # type: ignore[name-defined]
-        return torch.rand(*shape, device=device)  # type: ignore[name-defined]
+            return torch.rand(*shape, device=device,dtype=torch_dtype) * 2.0 - 1.0  # type: ignore[name-defined]
+        return torch.rand(*shape, device=device,dtype=torch_dtype)  # type: ignore[name-defined]
     @staticmethod
     def norm(A):
         # A의 device/dtype 유지, autograd 지원
