@@ -36,7 +36,23 @@ def gate(name: str) -> Any:
         T[1, 0] = 1
         T[1, 1] = -1
         return T / math.sqrt(2)
-
+    
+    elif name == 'I':
+        # Identity gate
+        T = backend.eye(2)
+        return T
+    elif name == 'S':
+        # Phase gate S
+        T = backend.eye_complex(2) * 0
+        T[0, 0] = 1
+        T[1, 1] = 1j
+        return T
+    elif name == 'Sd':
+        # Phase gate S dagger (conjugate transpose of S)
+        T = backend.eye_complex(2) * 0
+        T[0, 0] = 1
+        T[1, 1] = -1j
+        return T
     elif name == 'X':
         # Pauli-X gate
         T = backend.eye(2) * 0
