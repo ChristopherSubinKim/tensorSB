@@ -5,6 +5,7 @@ from . import DMRG
 from . import Module
 from . import batchedDensityMatrix
 from . import batchedMPS
+from . import circuit
 
 from .backend.backend import get_backend, reset_backend, get_frame
 
