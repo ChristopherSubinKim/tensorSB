@@ -47,7 +47,7 @@ def gate(name: str) -> Any:
         T[0, 0] = 1
         T[1, 1] = 1j
         return T
-    elif name == 'Sd':
+    elif name == 'Sdg':
         # Phase gate S dagger (conjugate transpose of S)
         T = backend.eye_complex(2) * 0
         T[0, 0] = 1

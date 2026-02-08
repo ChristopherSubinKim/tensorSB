@@ -38,7 +38,7 @@ class QuantumCircuit:
         self.state[qubit] = tensor.contract('ab,ijb->ija', S_gate, self.state[qubit])
     def sdg(self, qubit: int):
         """Apply Phase gate S dagger to the specified qubit."""
-        Sd_gate = gate('Sd')
+        Sd_gate = gate('Sdg')
         self.state[qubit] = tensor.contract('ab,ijb->ija', Sd_gate, self.state[qubit])
     def x(self, qubit: int):
         """Apply Pauli-X gate to the specified qubit."""
