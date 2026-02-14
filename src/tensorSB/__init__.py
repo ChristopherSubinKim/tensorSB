@@ -6,6 +6,7 @@ from . import Module
 from . import batchedDensityMatrix
 from . import batchedMPS
 from . import circuit
+from . import DensityMatrix
 
 from .backend.backend import get_backend, reset_backend, get_frame
 

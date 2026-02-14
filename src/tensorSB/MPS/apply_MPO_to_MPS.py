@@ -21,5 +21,6 @@ def apply_MPO_to_MPS(M : list[Any], H: list[Any]):
     HM = [None]*n_site
 
     for i in range(n_site):
-        HM[i] = backend.reshape(tensor.contract('abj,ijkl->akbli', M[i], H[i]), (M[i].shape[0]*H[i].shape[2],M[i].shape[1]*H[i].shape[3],M[i].shape[2]))
+        HM[i] = tensor.contract('abj,ijkl->akbli', M[i], H[i])
+        HM[i] = backend.reshape(HM[i],(M[i].shape[0]*H[i].shape[2],M[i].shape[1]*H[i].shape[3],H[i].shape[0]))
     return HM
