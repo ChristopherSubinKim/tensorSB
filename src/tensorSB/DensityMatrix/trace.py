@@ -19,7 +19,6 @@ def trace(rho : list[torch.tensor]):
     # iterative contraction
     for i in range(n_site):
         if i == 0:
-            print(rho[i].shape)
             t = tensor.contract('abii->ab', rho[i])
         else:
             t = tensor.contract('ab,bcii->ac', t, rho[i])

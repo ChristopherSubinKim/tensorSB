@@ -19,7 +19,6 @@ def trace_MPO(rho : list[torch.tensor]):
     # iterative contraction
     for i in range(n_site):
         if i == 0:
-            print(rho[i].shape)
             t = tensor.contract('iiab->ab', rho[i])
         else:
             t = tensor.contract('ab,iibc->ac', t, rho[i])
