@@ -23,7 +23,6 @@ import numpy as np
 try:
     import torch  # type: ignore
     torch.set_default_dtype(torch.float64)
-    # torch_dtype = torch.complex128
     torch_dtype = torch.float64
 except Exception:  # pragma: no cover
     torch = None  # type: ignore
@@ -114,6 +113,7 @@ class Backend(Protocol):
     def conj(self, A: Any) -> Any: ...
     def diag(self, A: Any, k: int = 0) -> Any: ...
     def trace(self, A: Any) -> Any: ...
+    def zeros(self, shape: Sequence[int]) -> Any: ...
 # ---------- NumPy implementation ----------
 
 class NumPyBackend:
@@ -165,6 +165,9 @@ class NumPyBackend:
     @staticmethod
     def trace(A: np.ndarray) -> np.ndarray:
         return np.trace(A)
+    @staticmethod
+    def zeros(shape: Sequence[int]) -> np.ndarray:
+        return np.zeros(shape)
 # ---------- CuPy implementation ----------
 
 class CupyBackend:
@@ -222,6 +225,9 @@ class CupyBackend:
     @staticmethod
     def trace(A):
         return cp.trace(A)
+    @staticmethod
+    def zeros(shape: Sequence[int]):
+        return cp.zeros(shape)  # type: ignore[name-defined]
 # ---------- Torch implementation ----------
 
 class TorchBackend:
@@ -290,6 +296,11 @@ class TorchBackend:
     @staticmethod
     def trace(A):
         return torch.trace(A) # type: ignore[name-defined]
+    
+    @staticmethod
+    def zeros(shape: Sequence[int]):
+        device = "cuda" if (torch.cuda.is_available()) else "cpu"  # type: ignore[attr-defined]
+        return torch.zeros(*shape, device=device,dtype=torch_dtype)  # type: ignore[name-defined]
 
 from threading import Lock
 import os
