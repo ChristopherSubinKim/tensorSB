@@ -38,8 +38,9 @@ def XXZMPO(Delta,h,n_site:int) -> list[Any]:
         H[i+1,0] = Sd[:,:,i]
     # fill in last row with S
     for i in range(3):
-        H[4,i+1] = ((i == 2)*Delta + (i != 2))*S[:,:,i]
-
+        H[4,i+1] = ((i == 1)*Delta + (i != 1))*S[:,:,i]
+    # Magnetic field term
+    H[0,4] = h*Sd[:,:,2]
     MPO = [None]*n_site
     middle = get_MPO(H,Ic)
     # fill in the MPO
@@ -50,5 +51,4 @@ def XXZMPO(Delta,h,n_site:int) -> list[Any]:
             MPO[i] = get_MPO(H, Ic, pos='end')
         else:
             MPO[i] = middle
-    H[0,4] = h*Sd[:,:,2]
     return MPO
