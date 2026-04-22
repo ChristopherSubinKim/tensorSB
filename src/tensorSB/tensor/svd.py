@@ -1,3 +1,5 @@
+import os
+
 from cuquantum.tensornet import tensor
 
 def svd(expr:str,*operands,n_keep: int|None = None, abs_cutoff: float = 0, rel_cutoff: float = 0, normalization: str|None = None, discarded_weight_cutoff: float = 0, return_info = False, use_cuda = True, **kwargs):
@@ -24,6 +26,9 @@ def svd(expr:str,*operands,n_keep: int|None = None, abs_cutoff: float = 0, rel_c
         In general, do not use this argument.
 
     """
+    env = os.getenv("USE_CUDA")
+    if env is not None:
+        use_cuda = env != "0"
     if use_cuda:
         return tensor.decompose(expr,*operands,method=tensor.SVDMethod(
             max_extent=n_keep,
